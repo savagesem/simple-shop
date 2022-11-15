@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ProductInput } from '../graphql/input/product.input';
-import { ProductGql } from '../graphql/model/product.gql';
 import { ProductRepository } from '../repository/product.repository';
 
 @Injectable()
