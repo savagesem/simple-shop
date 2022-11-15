@@ -19,4 +19,10 @@ export class ProductService {
       imageUrl: product.image_url,
     }));
   }
+
+  public validateProducts(productIds: number[]){
+    /*
+    Here can be logic to validate that product exists in the DB
+     */
+  }
 }

@@ -23,3 +23,9 @@ More info can be found here: https://nx.dev/
 
 1. Cannot start infra -> please check that docker is running
 2. Port is unavailable -> project uses 5433 for docker mapping, be sure it is available
+
+## Future thoughts
+
+1. For product search it is better to use elastic to do fulltext search.
+2. Order service can be extracted to the separate application with its own DB if we are going to move into the microservices world
+3. 
