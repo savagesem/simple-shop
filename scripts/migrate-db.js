@@ -1,15 +1,5 @@
 const postgres = require('postgres');
 
-const migration = `
- CREATE TABLE IF NOT EXISTS PRODUCT (
-   title VARCHAR(100),
-   description TEXT
-   price default 0,
-   quantity INTEGER DEFAULT 0
-   image_url TEXT
-);
-`;
-
 const sql = postgres({
   host: 'localhost',
   port: 5433,
@@ -27,10 +17,28 @@ async function addProducts() {
     `;
 }
 
-async function migrate() {
-  const res = await sql`
+async function createOrderTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS orders (
+        id SERIAL PRIMARY KEY,
+        shipping_address TEXT
+    );
+    `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS order_product (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER
+    );
+    `;
+}
+
+async function createProductTable() {
+  return await sql`
     CREATE TABLE IF NOT EXISTS product (
-    id SERIAL,
+    id SERIAL PRIMARY KEY,
     title VARCHAR(100),
     description TEXT,
     price FLOAT DEFAULT 0,
@@ -38,10 +46,15 @@ async function migrate() {
     image_url TEXT
     );
     `;
+}
+
+async function migrate() {
+  await createProductTable();
+  await createOrderTable();
 
   await addProducts();
 
-  console.log('Migration finished', res);
+  console.log('Migration finished...');
 }
 
 module.exports = { migrate };
