@@ -1,12 +1,7 @@
 const postgres = require('postgres');
+const config = require('../config/config.json');
 
-const sql = postgres({
-  host: 'localhost',
-  port: 5433,
-  username: 'postgres',
-  password: 'postgres',
-  database: 'myos',
-});
+const sql = postgres(config);
 
 async function addProducts() {
   return sql`
