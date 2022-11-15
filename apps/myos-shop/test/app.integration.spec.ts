@@ -2,7 +2,8 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app/app.module';
 import * as request from 'supertest';
-import { gql } from 'apollo-server-express';
+import sql from '../src/app/repository/db';
+
 let app: INestApplication;
 
 beforeAll(async () => {
@@ -119,6 +120,58 @@ describe('Application integration tests', () => {
 
       expect(response.body.data.products[0]).toMatchObject({
         title: 'pants',
+      });
+    });
+  });
+
+  describe('Checkout', () => {
+    const shippingAddress = 'moon';
+    const productId = 3;
+    const quantity = 1;
+    let response;
+    beforeAll(async () => {
+      const query = `
+        mutation {
+          checkout(
+            input: {
+              products: [{ id: ${productId}, quantity: ${quantity} }]
+              shippingAddress: "${shippingAddress}"
+            }
+          )
+        }
+      `;
+
+      response = await queryData(query);
+    });
+
+    test('response status code should be 200', () => {
+      expect(response.status).toBe(200);
+    });
+
+    test('order should be created in the DB', async () => {
+      const orderId = response.body.data.checkout;
+
+      const [record] = await sql`
+            select * from orders where id=${orderId}
+        `;
+
+      expect(record).toMatchObject({
+        id: orderId,
+        shipping_address: shippingAddress,
+      });
+    });
+
+    test(`order products record with product_id ${productId} and quantity=${quantity} should be created in the DB`, async () => {
+      const orderId = response.body.data.checkout;
+
+      const [record] = await sql`
+            select * from order_product where order_id=${orderId}
+        `;
+
+      expect(record).toMatchObject({
+        order_id: orderId,
+        product_id: productId,
+        quantity: quantity,
       });
     });
   });
